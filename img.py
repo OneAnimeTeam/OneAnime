@@ -71,7 +71,7 @@ class Handler(StreamRequestHandler):
                outs += '\r\n'+contents
                self.wfile.write(outs)
 serverip=''
-serverport=84
+serverport=1234
 server = Server((serverip, serverport), Handler)
 print 'Start OneAnime'
 server.serve_forever()
