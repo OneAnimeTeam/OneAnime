@@ -1,2 +1,2 @@
-pip install wand
-apt-get install libmagickwand-dev
+sudo pip install wand
+sudo apt-get install libmagickwand-dev

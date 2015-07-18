@@ -7,7 +7,6 @@ class Handler(StreamRequestHandler):
           addr = self.request.getpeername()
           print 'Your IP ', addr
           data = self.request.recv(1024)
-          print data
           headerList = data.split('\r\n')
           headerFirst = headerList[0]
           httpFirstItems = headerFirst.split(' ', 3)
@@ -56,14 +55,16 @@ class Handler(StreamRequestHandler):
                </body></html>"""
                httpContentType = 'Content-Type: text/html \r\n'
           str_length = len(contents)
+
           outs  = httpHeaderStat
           outs += httpContentType
           outs += 'Server: OneAnime\r\n'
+	  outs += 'X-Powered-By:OneAnime 1.0.3\r\n'
           outs += 'Content-Length: '+str(str_length)+'\r\n'
           outs += '\r\n'+contents
           self.wfile.write(outs)
 serverip=''
-serverport=1234
+serverport=84
 server = Server((serverip, serverport), Handler)
 print 'Start OneAnime'
 server.serve_forever()
