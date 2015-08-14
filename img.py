@@ -28,12 +28,12 @@ def Getdirname(data):
   headerFirst = headerList[0]
   httpFirstItems = headerFirst.split(' ', 3)
   if len(httpFirstItems) <> 3:
-       print "URL Error"
+       return "URL Error"
   else:
        httpUrl = httpFirstItems[1]
        if not httpUrl.endswith("/"):
             httpUrl=httpUrl+"/"
-  return httpUrl
+       return httpUrl
 
 def outHttp(httpHeaderStat,httpContentType,contents):
     outs = httpHeaderStat
@@ -46,6 +46,8 @@ def outHttp(httpHeaderStat,httpContentType,contents):
     return outs
 
 def Getimgfile(httpUrl,data):
+  print httpUrl
+  if httpUrl <> "URL Error":
     blocken=False
     global blocklist
     if len(blocklist)<>0:
