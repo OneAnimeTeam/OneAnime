@@ -12,8 +12,10 @@ pip install wand
 
 apt-get install libmagickwand-dev
 
-接着，打开 Screen 或者其他终端,将下面的文件保存为 py 运行，访问服务器的1234端口即可。
+接着，打开 Screen 或者其他终端,运行Python img.py,访问设定的端口即可。
 
+#白名单
+为了防止滥用,OneAnime 提供了白名单功能，您可以编辑 Whitelist.txt 文件来实现对访客的过滤（未在白名单的用户访问会被打上 OneAnime 的标志,您也可以修改代码的29行改成你喜欢的名字）
 ## 授权协议
 采用MIT协议分发
 
