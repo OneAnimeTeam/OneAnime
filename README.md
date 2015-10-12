@@ -1,4 +1,4 @@
-#什么是 OneAnime？
+什么是 OneAnime？
 
 OneAnime 为 Qwe7002开发的一个随机头图（也可以随机任何图片）服务器。使用 Python 制作。初衷只是想让访客看到不一样的头图。本程序采用自建 Http 服务器的设计。
 
@@ -6,13 +6,16 @@ OneAnime 为 Qwe7002开发的一个随机头图（也可以随机任何图片）
 
 首先你需要安装Wand扩展，使用 JPG 格式可以节约流量带宽和提高加载速度。
 
+apt-get install libmagickwand-dev
 pip install wand
 
-您需要安装以下支持：
+你可以使用 git clone 或者 wget 等方法把仓库下载下来然后直接运行 sh install.sh 来部署整个程序
 
-apt-get install libmagickwand-dev
+git clone https://github.com/qwe7002/OneAnime.git
 
-接着，打开 Screen 或者其他终端,运行Python img.py,访问设定的端口即可。
+接着，打开 Screen 或者其他终端,运行Python img.py（您可以使用 Python img.pyo）,访问153行设定的端口即可（默认为84，您也可以使用其他端口）。
+
+您可以使用 Nginx 进行反向代理以便使用 https。
 
 #白名单
 为了防止滥用,OneAnime 提供了白名单功能，您可以编辑 Whitelist.txt 文件来实现对访客的过滤（未在白名单的用户访问会被打上 OneAnime 的标志,您也可以修改代码的29行改成你喜欢的名字）
