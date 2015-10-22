@@ -7,5 +7,6 @@
 Icon?
 ehthumbs.db
 Thumbs.db
-*.pyc
-*.pyo
+
+*.py[cod]
+.vscode/
