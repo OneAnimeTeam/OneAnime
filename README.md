@@ -1,31 +1,39 @@
-什么是 OneAnime？
+# OneAnime
 
-OneAnime 为 Qwe7002开发的一个随机头图（也可以随机任何图片）服务器。使用 Python 制作。初衷只是想让访客看到不一样的头图。本程序采用自建 Http 服务器的设计。
+OneAnime 是 qwe7002 与 deluxghost 开发的一个随机头图（或者其他任何图片）服务器，最初只是为了让访问者看到不一样的博客头图。
 
-#如何安装
+## 特性
 
-首先你需要安装Wand扩展，使用 JPG 格式可以节约流量带宽和提高加载速度。
+* 将 `.png` 格式转换为 `.jpg` 格式以节约带宽，提高速度
+* 可选的白名单功能，不在白名单上的用户请求会被打上水印
 
-apt-get install libmagickwand-dev
-pip install wand
+## 安装
 
-你可以使用 git clone 或者 wget 等方法把仓库下载下来然后直接运行 sh install.sh 来部署整个程序
+OneAnime 由 Python 编写，依赖于 Wand 图像处理库。如果您是在 Ubuntu 操作系统上部署，可以用如下命令安装依赖：
 
-git clone https://github.com/qwe7002/OneAnime.git
+    sudo apt-get install -y python-wand libmagickwand-dev
+    
+之后，你可以将 OneAnime 克隆到本地：
 
-接着，打开 Screen 或者其他终端,运行Python img.py（您可以使用 Python img.pyo）,访问153行设定的端口即可（默认为84，您也可以使用其他端口）。
+    git clone https://github.com/qwe7002/OneAnime.git
+    
+## 设置与运行
 
-您可以使用 Nginx 进行反向代理以便使用 https。
+您需要编辑 `img.py` 进行一些设置：
 
-#白名单
-为了防止滥用,OneAnime 提供了白名单功能，您可以编辑 Whitelist.txt 文件来实现对访客的过滤（未在白名单的用户访问会被打上 OneAnime 的标志,您也可以修改代码的29行改成你喜欢的名字）
-## 授权协议
-采用MIT协议分发
+    server_info = ('0.0.0.0', 8000) # 服务器的 IP 与端口
+    font = './Inconsolata.otf' # 水印字体文件的路径
+    watermark = 'OneAnime' # 水印文字
+    wl_enable = True # 是否启用白名单
 
->Copyright (C) <year> <copyright holders>
+白名单文件是 `whitelist.txt`，每行一个域名，不会自动允许子域名（子域名需要单独列出），例如：
 
->Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+    qwe7002.com
+    deluxghost.com
+    test.deluxghost.me
 
->The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+您可以将图片放在当前目录或者子目录，只需要在请求时访问正确的地址。例如，如果您将图片放在 `photos` 目录下，就需要请求 `http://example.com:8000/photos`。
 
->THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+配置完成后，启动 Python 解释器即可启动 OneAnime 服务器：
+
+    python img.py

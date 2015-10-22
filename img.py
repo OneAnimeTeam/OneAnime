@@ -1,157 +1,219 @@
-from SocketServer import TCPServer, ThreadingMixIn, StreamRequestHandler
-import random,os,re
-Guestnum=0
-whitelist=[]
-Project_Name="OneAnime/1.0.4"
-class Server(ThreadingMixIn, TCPServer): pass
-class Handler(StreamRequestHandler):
-     def handle(self):
-          global Guestnum
-          Guestnum=Guestnum+1
-          print str(Guestnum)+' [Guest IP] :'+str(self.request.getpeername())
-          data = self.request.recv(1024)
-          self.wfile.write(Getdirname(data))
-              
-def pngtojpg(filename):
-  from wand.image import Image
-  with Image(filename = filename) as img:
-       filetemp=filename
-       filename=filename.replace(".png",".jpg")
-       img.save(filename = filename)
-       os.remove(filetemp)
-       return filename
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+from __future__ import print_function
+from SocketServer import ThreadingMixIn
+from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 
-def drawwater(filename):
-  from wand.font import Font
-  font = Font(path ="./Inconsolata.otf",size=72)
-  from wand.image import Image
-  with Image(filename = filename) as image:
-    image.caption('OneAnime', left=image.width-450, top=image.height-100, width=400, height=100, font=font)
-    filename=filename+".temp"
-    image.save(filename = filename)
-    return filename
-    
-def Getrefere(data):
-  pat = re.compile('Referer: (.*?)\r\n',re.S)
-  return pat.findall(data)
-    
-def Getdirname(data):
-  headerList = data.split('\r\n')
-  headerFirst = headerList[0]
-  httpFirstItems = headerFirst.split(' ', 3)
-  global Project_Name
-  global whitelist
-  if len(httpFirstItems) <> 3:
-       return "URL Error"
-  else:
-       httpUrl = httpFirstItems[1]
-       if httpUrl == "/update_whitelist":
-        Getwhitelist()
-        httpHeaderStat = 'HTTP/1.1 200 OK\r\n'
-        httpContentType = 'Content-Type: text/html\r\n'
-        contents = """<html><head>
-          <title>White list has been refreshed</title>
-          </head><body>
-          <center><h1>White list has been refreshed</h1></center>
-          <hr><center><p>"""+Project_Name+"""</p></center>
-          </body></html>"""
-        return outHttp(httpHeaderStat,httpContentType,contents)
-       if not httpUrl.endswith("/"):
-          httpUrl=httpUrl+"/"
-       return Getimgfile(httpUrl,data)
+server_info = ('0.0.0.0', 8000)
+font = './Inconsolata.otf'
+watermark = 'OneAnime'
+wl_enable = True
 
-def Getwhitelist():
-  global whitelist
-  f = open("./whitelist.txt", 'rb')
-  contents = f.read()
-  f.close()
-  whitelist=contents.split("|")
-def outHttp(httpHeaderStat,httpContentType,contents):
-  outs = httpHeaderStat
-  outs += httpContentType
-  outs += 'Server: OneAnime\r\n'
-  outs += 'X-Powered-By: '+Project_Name+'\r\n'
-  outs += 'Content-Length: '+str(len(contents))+'\r\n'
-  outs += 'Connection: close\r\n'
-  outs += '\r\n'+contents
-  return outs
+try:
+    import wand
+    wand_lib = True
+except ImportError:
+    wand_lib = False
 
-def Getfile(filename):
-  global Project_Name
-  try:
-      f = open(filename, 'rb')
-      contents = f.read()
-      f.close()
-      if filename.endswith(".jpg") or filename.endswith(".jpeg") or filename.endswith(".temp"):
-           mimeType='image/jpeg'
-      httpHeaderStat = 'HTTP/1.1 200 OK\r\n'
-      httpContentType = 'Content-Type: ' + mimeType + '\r\n'
-  except:
-        print "Loading Error"
-        httpHeaderStat = 'HTTP/1.1 500 Internal Server Error\r\n'
-        contents = """<html><head>
-        <title>500 Internal Server Error</title>
-        </head><body>
-        <center><h1>500 Internal Server Error</h1></center>
-        <hr><center><p>"""+Project_Name+"""</p></center>
-        </body></html>"""
-        httpContentType = 'Content-Type: text/html \r\n'
-  return outHttp(httpHeaderStat,httpContentType,contents)
-def Getimgfile(httpUrl,data):
-  if httpUrl <> "URL Error":
-    blocken=False
-    global whitelist
-    if len(whitelist) <> 0:
-      referer=Getrefere(data)
-      if len(referer) <> 0:
-          print "[Referer:"+referer[0]+"]"
-          for white in whitelist:
-              if referer[0].find(white) <> -1:
-                 blocken=True
-                 break
-    if(os.path.isdir('.'+httpUrl)):
-      files=[]
-      for filenames in os.listdir(os.path.dirname('.'+httpUrl)): 
-           if filenames.endswith(".jpg") or filenames.endswith(".jpeg") or filenames.endswith(".png"):
-                files.append("."+httpUrl+filenames)
-    else:
-        return print404(httpUrl)
-    if blocken==False:
-        if len(files) <> 0:
-          filename=random.choice(files)
-          if not os.path.isdir(filename+".temp"):
-            filename=drawwater(filename)
-          if filename.endswith(".png"):
-              filename=pngtojpg(filename)
-          print "[Return File:"+filename+"]"
-          return Getfile(filename)
+class OneAnime():
+
+    whitelist = []
+    wand_lib = False
+    font = ''
+    watermark = 'OneAnime'
+    wl_enable = True
+    project = 'OneAnime/2.0.0'
+
+    def __init__(self, wand_lib, font, watermark, wl_enable):
+        self.wand_lib = wand_lib
+        self.font = font
+        self.watermark = watermark
+        self.wl_enable = wl_enable
+
+    def update_whitelist(self):
+        import os
+        filename = './whitelist.txt'
+        if os.path.isfile(filename):
+            f = open(filename)
+            try:
+                lines = f.readlines()
+                lines = [line.strip('\n') for line in lines if line.strip()]
+            except:
+                lines = []
+            finally:
+                f.close()
         else:
-          return print404(httpUrl)
-    else:
-        if len(files) <> 0:
-          filename=random.choice(files)
-          if filename.endswith(".png"):
-              filename=pngtojpg(filename)
-          print "[Return File:"+filename+"]"
-          return Getfile(filename)
-        else:
-          return print404(httpUrl)
-def print404(httpUrl):
-  global Project_Name
-  httpHeaderStat = 'HTTP/1.1 404 Not Found\r\n'
-  httpContentType = 'Content-Type: text/html \r\n'
-  contents = """<html><head>
-  <title>404 Not Found</title>
-  </head><body>
-  <center><h1>404 Not Found</h1></center>
-  <center><p>The requested URL """+httpUrl+""" was not found on this server.</p></center>
-  <hr><center><p>"""+Project_Name+"""</p></center>
-  </body></html>"""
-  return outHttp(httpHeaderStat,httpContentType,contents)
+            lines = []
+        self.whitelist = lines
+        return len(lines)
 
-serverip=''
-serverport=84
-server = Server((serverip, serverport), Handler)
-print 'Start OneAnime'
-Getwhitelist()
-server.serve_forever()
+    def get_image(self, url, referer):
+        import os
+        import random
+        url = '.' + url
+        if not url.endswith('/'):
+            url += '/'
+        if os.path.exists(url):
+            files = []
+            for filename in os.listdir(url):
+                filename = url + filename
+                if os.path.splitext(filename)[1] in ('.jpg', '.jpeg', '.png') and self.wand_lib:
+                    files.append(filename)
+                elif os.path.splitext(filename)[1] in ('.jpg', '.jpeg'):
+                    files.append(filename)
+            if not files:
+                return None
+            filename = random.choice(files)
+            print('[Return]: ', filename)
+            return self._get_file(filename, referer)
+        else:
+            return ''
+
+    def _get_file(self, filename, referer):
+        import os
+        if os.path.splitext(filename)[1] == '.png' and self.wand_lib:
+            filename = self._png_to_jpg(filename)
+            if filename is None:
+                return None
+        if not self._is_whitelisted(referer) and self.wl_enable and self.wand_lib:
+            filename = self._watermark(filename)
+            if filename is None:
+                return None
+        if os.path.isfile(filename):
+            f = open(filename, 'rb')
+            try:
+                content = f.read()
+            except:
+                content = None
+            finally:
+                f.close()
+            return content
+        else:
+            return None
+
+    def _is_whitelisted(self, referer):
+        import urllib
+        if referer is None:
+            return False
+        proto, rest = urllib.splittype(referer)
+        host, rest = urllib.splithost(rest)
+        if [wl for wl in self.whitelist if wl == host]:
+            return True
+        return False
+
+    def _watermark(self, filename):
+        import os
+        from wand.image import Image
+        from wand.drawing import Drawing
+        if not os.path.isfile(self.font):
+            return filename
+        if os.path.isfile(filename):
+            with Drawing() as draw:
+                with Image(filename = filename) as image:
+                    draw.font = self.font
+                    draw.font_size = 42
+                    draw.text(50, 50, self.watermark)
+                    draw(image)
+                    image.format = 'jpeg'
+                    filename = os.path.splitext(filename)[0] + '.temp'
+                    image.save(filename=filename)
+                    return filename
+        else:
+            return None
+
+    def _png_to_jpg(self, filename):
+        import os
+        from wand.image import Image
+        if os.path.isfile(filename):
+            with Image(filename = filename) as image:
+                image.format = 'jpeg'
+                new_filename = os.path.splitext(filename)[0] + '.jpg'
+                image.save(filename=new_filename)
+                os.remove(filename)
+                return new_filename
+        else:
+            return None
+
+    def string_404(self, path):
+        strings = [
+            '<html><head>',
+            '<title>404 Not Found</title></head>',
+            '<body><center><h1>404 Not Found</h1>',
+            'Cannot GET %s' % (path),
+            '<hr /><p>%s</p></center></body></html>' % (self.project)
+        ]
+        return strings
+
+    def string_500(self):
+        strings = [
+            '<html><head>',
+            '<title>500 Internal Server Error</title></head>',
+            '<body><center><h1>500 Internal Server Error</h1>',
+            '<hr /><p>%s</p></center></body></html>' % (self.project)
+        ]
+        return strings
+
+    def string_update(self, count):
+        strings = [
+            '<html><head>',
+            '<title>Whitelist Refreshed</title></head>',
+            '<body><center><h1>Whitelist Refreshed</h1>',
+            '%s domain(s) has been loaded<hr />' % (str(count)),
+            '<p>%s</p></center></body></html>' % (self.project)
+        ]
+        return strings
+
+
+app = OneAnime(wand_lib, font, watermark, wl_enable)
+
+class RequestHandler(BaseHTTPRequestHandler):
+
+    global app
+
+    def do_GET(self):
+        referer = self.headers.get('Referer')
+        ip = self.client_address[0]
+        print('[Client IP]: ', ip)
+        print('[Referer]: ', referer)
+        if self.path == '/update':
+            count = app.update_whitelist()
+            print(count, 'domain(s) has been loaded')
+            self.send_response(200)
+            self.send_header('Content-type', 'text/html')
+            self.end_headers()
+            for line in app.string_update(count):
+                self.wfile.write(line)
+        else:
+            image = app.get_image(self.path, referer)
+            if image is None:
+                print('[Error]: 500 Internal Server Error')
+                self.send_response(500)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                for line in app.string_500():
+                    self.wfile.write(line)
+            elif image == '':
+                print('[Error]: 404 Not Found: ', self.path)
+                self.send_response(404)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                for line in app.string_404(self.path):
+                    self.wfile.write(line)
+            else:
+                self.send_response(200)
+                self.send_header('Content-Type', 'image/jpeg')
+                self.send_header('Content-Length', str(len(image)))
+                self.send_header('Server', app.project)
+                self.send_header('X-Powered-By', app.project)
+                self.send_header('Conncetion', 'close')
+                self.end_headers()
+                self.wfile.write(image)
+
+class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
+    pass
+
+if __name__ == '__main__':
+    print(app.update_whitelist(), 'domain(s) has been loaded')
+    print('Serving OneAnime on %s port %s ' % server_info)
+    server = ThreadingHTTPServer(server_info, RequestHandler)
+    server.serve_forever()
