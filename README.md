@@ -32,6 +32,8 @@ OneAnime 由 Python 编写，依赖于 Wand 图像处理库。如果您是在 Ub
     deluxghost.com
     test.deluxghost.me
 
+您可以将图片放在当前目录或者子目录，只需要在请求时访问正确的地址。例如，如果您将图片放在 `photos` 目录下，就需要请求 `http://example.com:8000/photos`。
+
 配置完成后，启动 Python 解释器即可启动 OneAnime 服务器：
 
     python img.py
