@@ -22,7 +22,7 @@ class OneAnime():
     font = ''
     watermark = 'OneAnime'
     wl_enable = True
-    project = 'OneAnime/2.0.0'
+    project = 'OneAnime/2.0.1'
 
     def __init__(self, wand_lib, font, watermark, wl_enable):
         self.wand_lib = wand_lib
@@ -37,7 +37,7 @@ class OneAnime():
             f = open(filename)
             try:
                 lines = f.readlines()
-                lines = [line.strip('\n') for line in lines if line.strip()]
+                lines = [line.strip('\r\n') for line in lines if line.strip()]
             except:
                 lines = []
             finally:
