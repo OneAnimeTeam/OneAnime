@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 import os
 import random
+import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
 
@@ -10,9 +11,19 @@ from PIL import Image
 project = 'OneAnime/2.0.1'
 
 
+style = {
+    'black': 30, 'red': 31, 'green': 32, 'yellow': 33,
+    'blue': 34, 'purple': 35, 'cyan': 36, 'white': 37,
+    "none": 0
+}
+def log(state, message, color="none"):
+    now_time = time.strftime("%Y/%m/%d %X", time.localtime())
+    print("\033[{0}m{1} [{2}] {3}\033[0m".format(style[color], now_time, state, message))
+
+
 def get_image(url):
     content = None
-    choice_filename = None
+    hit_filename = None
     if os.path.isdir(url):
         if not url.endswith('/'):
             url += '/'
@@ -22,18 +33,19 @@ def get_image(url):
             if os.path.splitext(filename)[1] in ('.webp', '.jpg', '.jpeg', '.png'):
                 files.append(filename)
         if len(files) != 0:
-            choice_filename = random.choice(files)
+            hit_filename = random.choice(files)
     if os.path.isfile(url):
         if os.path.splitext(url)[1] in ('.webp', '.jpg', '.jpeg', '.png'):
-            choice_filename = url
-    if choice_filename is not None:
-        if os.path.splitext(choice_filename)[1] in ('.jpg', '.jpeg', '.png'):
-            choice_filename = image_to_webP(choice_filename)
-        if os.path.isfile(choice_filename):
-            f = open(choice_filename, 'rb')
+            hit_filename = url
+    if hit_filename is not None:
+        if os.path.splitext(hit_filename)[1] in ('.jpg', '.jpeg', '.png'):
+            hit_filename = image_to_webP(hit_filename)
+        if os.path.isfile(hit_filename):
+            f = open(hit_filename, 'rb')
             content = f.read()
             f.close()
-    return choice_filename, content
+            log("info", 'Hit the file: "{0}"'.format(os.path.basename(hit_filename)))
+    return hit_filename, content
 
 
 def image_to_webP(filename):
@@ -42,6 +54,7 @@ def image_to_webP(filename):
         new_filename = os.path.splitext(filename)[0] + '.webp'
         Image.open(filename).save(new_filename, "WEBP")
         os.remove(filename)
+    log("convert", 'Successfully converted the file "{0}" to webp'.format(os.path.basename(filename)),"green")
     return new_filename
 
 
@@ -72,10 +85,11 @@ class RequestHandler(BaseHTTPRequestHandler):
             split_url = url.split("?")
             url = split_url[0]
         filename, image = get_image(url)
-        if image is not None:
-            send_request(self, 200, image, len(image), os.path.basename(filename))
-        content, length = error_string("404 Not Found")
-        send_request(self, 404, content, length)
+        if image is None:
+            content, length = error_string("404 Not Found")
+            send_request(self, 404, content, length)
+            return
+        send_request(self, 200, image, len(image), os.path.basename(filename))
 
 
 
@@ -84,6 +98,7 @@ class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
 
 if __name__ == '__main__':
     server_info = ('0.0.0.0', 8000)
-    print('Serving OneAnime on %s port %s ' % server_info)
+    log("info", 'Serving OneAnime on {0} port {1} '.format(server_info[0], server_info[1]))
     server = ThreadingHTTPServer(server_info, RequestHandler)
     server.serve_forever()
+
