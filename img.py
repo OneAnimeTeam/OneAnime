@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import json
 import os
 import random
 import time
@@ -10,6 +11,12 @@ from PIL import Image
 
 project = 'OneAnime/2.0.1'
 
+
+def read_file(filename, mode="r"):
+    f = open(filename, mode)
+    content = f.read()
+    f.close()
+    return content
 
 style = {
     'black': 30, 'red': 31, 'green': 32, 'yellow': 33,
@@ -34,28 +41,19 @@ def get_image(url):
                 files.append(filename)
         if len(files) != 0:
             hit_filename = random.choice(files)
-    if os.path.isfile(url):
-        if os.path.splitext(url)[1] in ('.webp', '.jpg', '.jpeg', '.png'):
-            hit_filename = url
+    if os.path.isfile(url) and os.path.splitext(url)[1] in ('.webp', '.jpg', '.jpeg', '.png'):
+        hit_filename = url
+    #convert image to webp
+    if os.path.splitext(hit_filename)[1] in ('.jpg', '.jpeg', '.png'):
+        new_filename = os.path.splitext(hit_filename)[0] + '.webp'
+        Image.open(hit_filename).save(new_filename, "webp")
+        os.remove(hit_filename)
+        hit_filename=new_filename
+        log("convert", 'Successfully converted the file "{0}" to webp'.format(os.path.basename(hit_filename)), "green")
     if hit_filename is not None:
-        if os.path.splitext(hit_filename)[1] in ('.jpg', '.jpeg', '.png'):
-            hit_filename = image_to_webP(hit_filename)
-        if os.path.isfile(hit_filename):
-            f = open(hit_filename, 'rb')
-            content = f.read()
-            f.close()
-            log("info", 'Hit the file: "{0}"'.format(os.path.basename(hit_filename)))
+        content = read_file(hit_filename, "rb")
+        log("info", 'Hit the file: "{0}"'.format(os.path.basename(hit_filename)))
     return hit_filename, content
-
-
-def image_to_webP(filename):
-    new_filename = None
-    if os.path.exists(filename):
-        new_filename = os.path.splitext(filename)[0] + '.webp'
-        Image.open(filename).save(new_filename, "WEBP")
-        os.remove(filename)
-    log("convert", 'Successfully converted the file "{0}" to webp'.format(os.path.basename(filename)),"green")
-    return new_filename
 
 
 def error_string(error):
@@ -80,7 +78,7 @@ def send_request(self, response, content, length, filename=None):
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        url = '.' + self.path
+        url = location + self.path
         if url.find("?") != -1:
             split_url = url.split("?")
             url = split_url[0]
@@ -97,8 +95,10 @@ class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
     pass
 
 if __name__ == '__main__':
-    server_info = ('0.0.0.0', 8000)
-    log("info", 'Serving OneAnime on {0} port {1} '.format(server_info[0], server_info[1]))
+    config = json.loads(read_file("./config.json"))
+    server_info = (config["server"], config["port"])
+    location = config["location"]
+    log("info", 'Serving OneAnime on {0}:{1} '.format(server_info[0], server_info[1]))
     server = ThreadingHTTPServer(server_info, RequestHandler)
     server.serve_forever()
 

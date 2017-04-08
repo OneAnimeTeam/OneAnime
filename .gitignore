@@ -10,3 +10,4 @@ Thumbs.db
 
 *.py[cod]
 .vscode/
+config.json
