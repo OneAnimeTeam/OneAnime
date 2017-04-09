@@ -14,13 +14,13 @@ OneAnime is written in Python3 and relies on the PIL image processing library.
 You can clone OneAnime to local:
 
 ```shell
-    git clone https://github.com/qwe7002/OneAnime.git
+git clone https://github.com/qwe7002/OneAnime.git
 ```
 
 After that, install the graphics support library:
 
 ```shell
-    pip3 install Pillow
+pip3 install Pillow
 ```
 
 ## Configure your server
@@ -29,9 +29,9 @@ You need to write your `config.json` according to `config.example.json` . Rememb
 
 ```
 {
-  "Server": "0.0.0.0", # server listening address, 0.0.0.0 to accept all requests received by native IP
-  "Port": 8080, # server listening port
-  "Location": "./ image" # image file storage location, it is recommended that you save the image folder to upgrade when the normal `git pull`
+  "server": "0.0.0.0", #Server listening address, 0.0.0.0 to accept all requests received by native IP
+  "port": 8080, #Server listening port
+  "location": "./ image" #Image file storage location, it is recommended that you save the image folder to upgrade when the normal `git pull`
 }
 ```
 
@@ -39,7 +39,7 @@ You can place the image in the directory you specified, only need to access the 
 
 Once the configuration is complete, start your interpreter to start the OneAnime server:
 ```shell
-    Python3 oneanime.py
+python3 oneanime.py
 ```
 
 ## Keep running and monitor your blog

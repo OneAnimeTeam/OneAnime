@@ -14,13 +14,13 @@ OneAnime 使用 Python3 编写，依赖于 PIL 图像处理库。
 你可以将 OneAnime 克隆到本地：
 
 ```shell
-    git clone https://github.com/qwe7002/OneAnime.git
+git clone https://github.com/qwe7002/OneAnime.git
 ```
 
 之后，安装图形支持库:
 
 ```shell
-    pip3 install Pillow
+pip3 install Pillow
 ```
     
 ## 配置您的服务器
