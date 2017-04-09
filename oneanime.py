@@ -38,7 +38,7 @@ def get_image(url, use_webp):
         files = []
         for filename in os.listdir(url):
             filename = url + filename
-            if os.path.splitext(filename)[1].lower() in ('.webp', '.jpg', '.jpeg', '.png'):
+            if os.path.splitext(filename)[1].lower() in ('.convert','.webp', '.jpg', '.jpeg', '.png'):
                 files.append(filename)
         if len(files) != 0:
             hit_filename = random.choice(files)
@@ -63,7 +63,8 @@ def get_image(url, use_webp):
             image.save(new_filename+".jpgp","JPEG", quality = 80, optimize = True, progressive = True)
             log("convert", 'Successfully converted the file "{0}" to webp and jpgp'.format(os.path.basename(hit_filename)),
             "green")
-
+            os.mknod("{0}/{1}.convert".format(path, file))
+            os.remove(hit_filename)
         hit_filename = new_filename + ".jpgp"
         if use_webp:
             hit_filename=new_filename+".webp"
