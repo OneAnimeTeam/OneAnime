@@ -6,9 +6,8 @@ import random
 import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
-
 from PIL import Image
-
+import urllib.parse as url
 project = 'OneAnime/2.0.1'
 
 
@@ -67,7 +66,7 @@ def send_request(self, response, content, length, filename=None):
     content_type = 'text/html'
     if response == 200:
         content_type = 'image/webp'
-        self.send_header('Content-Disposition', 'inline;filename="{0}"'.format(filename))
+        self.send_header('Content-Disposition', 'inline;filename="{0}"'.format(url.urlencode(filename)))
     self.send_header('Content-type', content_type)
     self.send_header('Content-Length', length)
     self.send_header('Server', project)
