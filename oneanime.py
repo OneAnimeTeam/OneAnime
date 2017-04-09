@@ -8,7 +8,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
 from PIL import Image
 import urllib.parse as url_parse
-project = 'OneAnime/2.0.1'
+project = 'OneAnime/3.0.3'
 
 
 def read_file(filename, mode="r"):
