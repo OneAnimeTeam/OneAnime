@@ -63,7 +63,7 @@ def get_image(url, use_webp):
             log("convert", 'Successfully converted the file "{0}" to webp and jpgp'.format(os.path.basename(hit_filename)),
             "green")
             hit_filename = new_filename + ".jpgp"
-            if use_webp or request_extension is ".webp":
+            if use_webp or request_extension == ".webp":
                 hit_filename=new_filename+".webp"
     if hit_filename is not None:
         content = read_file(hit_filename, "rb")
@@ -83,7 +83,7 @@ def send_request(self, response, content, length, filename=None):
     content_type = 'text/html'
     if response == 200:
         content_type = 'image/jpeg'
-        if os.path.splitext(filename)[1].lower() is ".webp":
+        if os.path.splitext(filename)[1].lower() == ".webp":
             content_type = 'image/webp'
         self.send_header('Content-Disposition', 'inline;filename="{0}"'.format(url_parse.quote(filename, safe='')))
     self.send_header('Content-type', content_type)
