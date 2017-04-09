@@ -1,37 +1,66 @@
 # OneAnime
 
-OneAnime 是一个随机图片服务器，最初目的是为了让访问者看到不一样的博客头图。
+OneAnime is a random picture server, the original purpose is to allow visitors to see different blog headlines.
 
-## 为什么使用OneAnime
+## Why use OneAnime
 
-* 将 `jeg` `png` 格式转换为 `.webp` 格式,节约带宽以及您的磁盘空间。
-* 单文件设计，更小巧和轻便。开箱即可使用。
+* Convert the `jeg` `png` format to`.webp` format, save bandwidth and your disk space.
+* Single file design, more compact and lightweight. Out of the box to use.
 
-## 安装所需要的环境
+## Install the required environment
 
-OneAnime 由 Python 编写，依赖于 PIL 图像处理库。
+OneAnime is written in Python3 and relies on the PIL image processing library.
 
-你可以将 OneAnime 克隆到本地：
+You can clone OneAnime to local:
 
+```shell
     git clone https://github.com/qwe7002/OneAnime.git
+```
 
-之后，安装图形支持库:
+After that, install the graphics support library:
 
+```shell
     pip3 install Pillow
-    
-## 配置您的服务器
+```
 
-您需要根据 `config.example.json` 来编写您的 `config.json`。记得，json并不允许注释的存在！
+## Configure your server
 
+You need to write your `config.json` according to `config.example.json` . Remember, json does not allow the presence of annotations!
+
+```
 {
-  "server":"0.0.0.0", #服务器监听地址，0.0.0.0为接受所有本机IP收到的请求
-  "port":8080, #服务器监听端口
-  "location":"./image" #图片文件存放地点,建议您存放在image文件夹下以便升级的时候能够正常 `git pull`
+  "Server": "0.0.0.0", # server listening address, 0.0.0.0 to accept all requests received by native IP
+  "Port": 8080, # server listening port
+  "Location": "./ image" # image file storage location, it is recommended that you save the image folder to upgrade when the normal `git pull`
 }
+```
 
-您可以将图片放在您指定的目录下，只需要在请求时访问正确的地址。例如，如果您将图片放在 `image/photos` 目录下，那么直接请求 `/photos` 即可。
+You can place the image in the directory you specified, only need to access the correct address when requested. For example, if you put the image in the `image / photos` directory, you can request` / photos' directly.
 
-配置完成后，启动 Python 解释器即可启动 OneAnime 服务器：
+Once the configuration is complete, start your interpreter to start the OneAnime server:
+```shell
+    Python3 oneanime.py
+```
 
-    python3 oneanime.py
-    （您也可以使用 ./oneanime.py 来启动服务器）
+## Keep running and monitor your blog
+
+In order to avoid each update, the program error to bring you the trouble. SmartBlog strongly recommends that you use NodeJS-based monitoring programs: PM2
+
+For more information about PM2 installation, please see [How To Install Node.js on Ubuntu 16.04 | DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-16-04) and [PM2 - Quick Start](http://pm2.keymetrics.io/docs/usage/quick-start/)
+
+Then you just need to run
+
+```shell
+pm2 start oneanime.py
+```
+
+It can be achieved in the update file or program error, automatically restart SmartBlog.
+
+You can also use it
+
+```shell
+pm2 startup
+pm2 save
+```
+
+So that your SmartBlog can start automatically when the system is powered on
