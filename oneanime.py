@@ -1,15 +1,16 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 import json
 import os
 import random
 import time
+import urllib.parse as url_parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
 
 from PIL import Image
 
-project = 'OneAnime/2.0.1'
+project = 'OneAnime/3.0.3'
 
 
 def read_file(filename, mode="r"):
@@ -28,7 +29,7 @@ def log(state, message, color="none"):
     print("\033[{0}m{1} [{2}] {3}\033[0m".format(style[color], now_time, state, message))
 
 
-def get_image(url):
+def get_image(url, use_webp):
     content = None
     hit_filename = None
     if os.path.isdir(url):
@@ -37,23 +38,42 @@ def get_image(url):
         files = []
         for filename in os.listdir(url):
             filename = url + filename
-            if os.path.splitext(filename)[1] in ('.webp', '.jpg', '.jpeg', '.png'):
+            if os.path.splitext(filename)[1].lower() in ('.webp', '.jpg', '.jpeg', '.png'):
                 files.append(filename)
         if len(files) != 0:
             hit_filename = random.choice(files)
-    if os.path.isfile(url) and os.path.splitext(url)[1] in ('.webp', '.jpg', '.jpeg', '.png'):
-        hit_filename = url
+    #Check the extension
+    request_extension=None
+    if hit_filename is None :
+        request_extension=os.path.splitext(url)[1].lower()
+        if request_extension in ('.webp', ".jpgp"):
+            hit_filename = url
     #convert image to webp
-    if hit_filename is not None and os.path.splitext(hit_filename)[1] in ('.jpg', '.jpeg', '.png'):
-        new_filename = os.path.splitext(hit_filename)[0] + '.webp'
-        Image.open(hit_filename).save(new_filename, "webp")
-        os.remove(hit_filename)
-        hit_filename=new_filename
-        log("convert", 'Successfully converted the file "{0}" to webp'.format(os.path.basename(hit_filename)), "green")
+    if hit_filename is not None:
+        file = os.path.basename(hit_filename)
+        file = os.path.splitext(file)[0]
+        path = os.path.dirname(hit_filename)
+        if not os.path.isdir("{0}/convert".format(path)):
+            os.mkdir("{0}/convert".format(path))
+        new_filename = "{0}/convert/{1}".format(path, file)
+
+        if not os.path.exists(new_filename+".webp"):
+            image = Image.open(hit_filename)
+            image.save(new_filename+".webp", "webp")
+            image.save(new_filename+".jpgp","JPEG", quality = 80, optimize = True, progressive = True)
+            log("convert", 'Successfully converted the file "{0}" to webp and jpgp'.format(os.path.basename(hit_filename)),
+            "green")
+
+        hit_filename = new_filename + ".jpgp"
+        if use_webp:
+            hit_filename=new_filename+".webp"
+        if request_extension is not None:
+            hit_filename = new_filename+request_extension
     if hit_filename is not None:
         content = read_file(hit_filename, "rb")
         log("info", 'Hit the file: "{0}"'.format(os.path.basename(hit_filename)))
     return hit_filename, content
+
 
 
 def error_string(error):
@@ -66,8 +86,10 @@ def send_request(self, response, content, length, filename=None):
     self.send_response(response)
     content_type = 'text/html'
     if response == 200:
-        content_type = 'image/webp'
-        self.send_header('Content-Disposition', 'inline;filename="{0}"'.format(filename))
+        content_type = 'image/jpeg'
+        if os.path.splitext(filename)[1].lower() == ".webp":
+            content_type = 'image/webp'
+        self.send_header('Content-Disposition', 'inline;filename="{0}"'.format(url_parse.quote(filename, safe='')))
     self.send_header('Content-type', content_type)
     self.send_header('Content-Length', length)
     self.send_header('Server', project)
@@ -78,16 +100,19 @@ def send_request(self, response, content, length, filename=None):
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        url = location + self.path
+        use_webp = False
+        url = location + url_parse.unquote(self.path)
         if url.find("?") != -1:
             split_url = url.split("?")
             url = split_url[0]
-        filename, image = get_image(url)
+        if self.headers['accept'].find("image/webp") != -1:
+            use_webp = True
+        filename, image = get_image(url, use_webp)
         if image is None:
             content = error_string("404 Not Found")
             send_request(self, 404, bytes(content, encoding="utf-8"), len(content))
             return
-        send_request(self, 200, image, len(image), os.path.basename(filename))
+        send_request(self, 200, image, len(image),filename=os.path.basename(filename))
 
 
 
