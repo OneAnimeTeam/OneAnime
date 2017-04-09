@@ -65,8 +65,10 @@ def get_image(url, use_webp):
             "green")
 
         hit_filename = new_filename + ".jpgp"
-        if use_webp or request_extension == ".webp":
+        if use_webp:
             hit_filename=new_filename+".webp"
+        if request_extension is not None:
+            hit_filename = new_filename+request_extension
     if hit_filename is not None:
         content = read_file(hit_filename, "rb")
         log("info", 'Hit the file: "{0}"'.format(os.path.basename(hit_filename)))
