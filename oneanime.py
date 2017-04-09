@@ -44,7 +44,7 @@ def get_image(url):
     if os.path.isfile(url) and os.path.splitext(url)[1] in ('.webp', '.jpg', '.jpeg', '.png'):
         hit_filename = url
     #convert image to webp
-    if os.path.splitext(hit_filename)[1] in ('.jpg', '.jpeg', '.png'):
+    if hit_filename is not None and os.path.splitext(hit_filename)[1] in ('.jpg', '.jpeg', '.png'):
         new_filename = os.path.splitext(hit_filename)[0] + '.webp'
         Image.open(hit_filename).save(new_filename, "webp")
         os.remove(hit_filename)
@@ -59,7 +59,7 @@ def get_image(url):
 def error_string(error):
     strings = '<html><head><title>{0}</title></head><body><center><h1>{0}</h1><hr/><p>{1}</p></center></body></html>'.format(
         error, project)
-    return bytes(strings, encoding="utf8"), len(strings)
+    return strings
 
 
 def send_request(self, response, content, length, filename=None):
@@ -84,8 +84,8 @@ class RequestHandler(BaseHTTPRequestHandler):
             url = split_url[0]
         filename, image = get_image(url)
         if image is None:
-            content, length = error_string("404 Not Found")
-            send_request(self, 404, content, length)
+            content = error_string("404 Not Found")
+            send_request(self, 404, bytes(content, encoding="utf-8"), len(content))
             return
         send_request(self, 200, image, len(image), os.path.basename(filename))
 

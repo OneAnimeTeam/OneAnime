@@ -1,31 +1,37 @@
 # OneAnime
 
-OneAnime 是 @qwe7002 与 @deluxghost 开发的一个随机头图（或者其他任何图片）服务器，最初只是为了让访问者看到不一样的博客头图。
+OneAnime 是一个随机图片服务器，最初目的是为了让访问者看到不一样的博客头图。
 
-## 特性
+## 为什么使用OneAnime
 
-* 将 `.png` 格式转换为 `.jpg` 格式以节约带宽，提高速度
-* 可选的白名单功能，不在白名单上的用户请求会被打上水印
+* 将 `jeg` `png` 格式转换为 `.webp` 格式,节约带宽以及您的磁盘空间。
+* 单文件设计，更小巧和轻便。开箱即可使用。
 
-## 安装
+## 安装所需要的环境
 
-OneAnime 由 Python 编写，依赖于 PIL 图像处理库。你可以将 OneAnime 克隆到本地：
+OneAnime 由 Python 编写，依赖于 PIL 图像处理库。
+
+你可以将 OneAnime 克隆到本地：
 
     git clone https://github.com/qwe7002/OneAnime.git
 
-之后，
+之后，安装图形支持库:
+
+    pip3 install Pillow
     
-## 设置与运行
+## 配置您的服务器
 
-您需要编辑 `img.py` 进行一些设置：
+您需要根据 `config.example.json` 来编写您的 `config.json`。记得，json并不允许注释的存在！
 
-    server_info = ('0.0.0.0', 8000) # 服务器的 IP 与端口
-    font = './Inconsolata.otf' # 水印字体文件的路径
-    watermark = 'OneAnime' # 水印文字
-    wl_enable = True # 是否启用白名单
+{
+  "server":"0.0.0.0", #服务器监听地址，0.0.0.0为接受所有本机IP收到的请求
+  "port":8080, #服务器监听端口
+  "location":"./image" #图片文件存放地点,建议您存放在image文件夹下以便升级的时候能够正常 `git pull`
+}
 
-您可以将图片放在当前目录或者子目录，只需要在请求时访问正确的地址。例如，如果您将图片放在 `photos` 目录下，就需要请求 `http://example.com:8000/photos`。
+您可以将图片放在您指定的目录下，只需要在请求时访问正确的地址。例如，如果您将图片放在 `image/photos` 目录下，那么直接请求 `/photos` 即可。
 
 配置完成后，启动 Python 解释器即可启动 OneAnime 服务器：
 
-    python3 img.py
+    python3 oneanime.py
+    （您也可以使用 ./oneanime.py 来启动服务器）
