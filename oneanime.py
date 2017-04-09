@@ -7,7 +7,7 @@ import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
 from PIL import Image
-import urllib.parse as url
+import urllib.parse as url_parse
 project = 'OneAnime/2.0.1'
 
 
@@ -66,7 +66,7 @@ def send_request(self, response, content, length, filename=None):
     content_type = 'text/html'
     if response == 200:
         content_type = 'image/webp'
-        self.send_header('Content-Disposition', 'inline;filename="{0}"'.format(url.quote(filename, safe='')))
+        self.send_header('Content-Disposition', 'inline;filename="{0}"'.format(url_parse.quote(filename, safe='')))
     self.send_header('Content-type', content_type)
     self.send_header('Content-Length', length)
     self.send_header('Server', project)
@@ -77,7 +77,7 @@ def send_request(self, response, content, length, filename=None):
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
-        url = location + self.path
+        url = location + url_parse.unquote(self.path)
         if url.find("?") != -1:
             split_url = url.split("?")
             url = split_url[0]
