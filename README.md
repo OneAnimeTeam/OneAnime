@@ -31,7 +31,7 @@ You need to write your `config.json` according to `config.example.json` . Rememb
 {
   "server": "0.0.0.0", #Server listening address, 0.0.0.0 to accept all requests received by native IP
   "port": 8080, #Server listening port
-  "location": "./ image" #Image file storage location, it is recommended that you save the image folder to upgrade when the normal `git pull`
+  "location": "./image" #Image file storage location, it is recommended that you save the image folder to upgrade when the normal `git pull`
 }
 ```
 
