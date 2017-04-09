@@ -66,7 +66,7 @@ def send_request(self, response, content, length, filename=None):
     content_type = 'text/html'
     if response == 200:
         content_type = 'image/webp'
-        self.send_header('Content-Disposition', 'inline;filename="{0}"'.format(url.urlencode(filename)))
+        self.send_header('Content-Disposition', 'inline;filename="{0}"'.format(url.quote(filename, safe='')))
     self.send_header('Content-type', content_type)
     self.send_header('Content-Length', length)
     self.send_header('Server', project)
