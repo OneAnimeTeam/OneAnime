@@ -56,15 +56,17 @@ def get_image(url, use_webp):
         if not os.path.isdir("{0}/convert".format(path)):
             os.mkdir("{0}/convert".format(path))
         new_filename = "{0}/convert/{1}".format(path, file)
+
         if not os.path.exists(new_filename+".webp"):
             image = Image.open(hit_filename)
             image.save(new_filename+".webp", "webp")
             image.save(new_filename+".jpgp","JPEG", quality = 80, optimize = True, progressive = True)
             log("convert", 'Successfully converted the file "{0}" to webp and jpgp'.format(os.path.basename(hit_filename)),
             "green")
-            hit_filename = new_filename + ".jpgp"
-            if use_webp or request_extension == ".webp":
-                hit_filename=new_filename+".webp"
+
+        hit_filename = new_filename + ".jpgp"
+        if use_webp or request_extension == ".webp":
+            hit_filename=new_filename+".webp"
     if hit_filename is not None:
         content = read_file(hit_filename, "rb")
         log("info", 'Hit the file: "{0}"'.format(os.path.basename(hit_filename)))
