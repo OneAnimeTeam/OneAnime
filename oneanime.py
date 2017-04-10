@@ -60,7 +60,7 @@ def get_image(url, use_webp):
         if not os.path.exists(new_filename+".webp"):
             image = Image.open(hit_filename)
             image.save(new_filename+".webp", "webp")
-            image.save(new_filename+".jpgp","JPEG", quality = 80, optimize = True, progressive = True)
+            image.save(new_filename+".jpgp","JPEG", quality = 100, optimize = True, progressive = True)
             log("convert", 'Successfully converted the file "{0}" to webp and jpgp'.format(os.path.basename(hit_filename)),
             "green")
             os.mknod("{0}/{1}.convert".format(path, file))
