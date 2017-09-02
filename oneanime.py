@@ -64,7 +64,7 @@ def get_image(url, use_webp):
                     os.mkdir("{0}convert".format(url))
                 image = Image.open(url+unconvert_file)
                 image.save(result_file + ".webp", "webp")
-                image.save(result_file + ".jpgp", "JPEG", quality=80, optimize=True, progressive=True)
+                image.save(result_file + ".jpgp", "JPEG", quality=100, optimize=True, progressive=True)
                 log("convert",
                     'Successfully converted the file "{0}" to webp and jpgp'.format(os.path.basename(hit_filename)),
                     "green")
