@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+import hashlib
 import json
 import os
 import random
@@ -29,51 +30,52 @@ def log(state, message, color="none"):
     print("\033[{0}m{1} [{2}] {3}\033[0m".format(style[color], now_time, state, message))
 
 
+def write_file(filename, content):
+    f = open(filename, "w", newline=None)
+    f.write(content)
+    f.close()
+    return True
+
 def get_image(url, use_webp):
-    content = None
-    hit_filename = None
-    if os.path.isdir(url):
-        if not url.endswith('/'):
-            url += '/'
-        files = []
+    result_type = ".webp"
+    if not use_webp:
+        result_type = ".jpgp"
+    result_filename = None
+    result_file = None
+    if result_filename is None:
+        files_convert = list()
+        files_unconvert = list()
+        if os.path.exists(url + "convert_list.json"):
+            files_convert = json.loads(read_file(url + "convert_list.json"))
+        dir_list = list()
         for filename in os.listdir(url):
-            filename = url + filename
-            if os.path.splitext(filename)[1].lower() in ('.convert','.webp', '.jpg', '.jpeg', '.png'):
-                files.append(filename)
+            if os.path.splitext(filename)[1].lower() in ('.webp', '.jpg', '.jpeg', '.png'):
+                dir_list.append(filename)
+                files_unconvert.append(os.path.splitext(filename)[0])
+        files = files_convert+files_unconvert
         if len(files) != 0:
             hit_filename = random.choice(files)
-    #Check the extension
-    request_extension=None
-    if hit_filename is None :
-        request_extension=os.path.splitext(url)[1].lower()
-        if request_extension in ('.webp', ".jpgp"):
-            hit_filename = url
-    #convert image to webp
-    if hit_filename is not None:
-        file = os.path.basename(hit_filename)
-        file = os.path.splitext(file)[0]
-        path = os.path.dirname(hit_filename)
-        if not os.path.isdir("{0}/convert".format(path)):
-            os.mkdir("{0}/convert".format(path))
-        new_filename = "{0}/convert/{1}".format(path, file)
-
-        if not os.path.exists(new_filename+".webp"):
-            image = Image.open(hit_filename)
-            image.save(new_filename+".webp", "webp")
-            image.save(new_filename+".jpgp","JPEG", quality = 80, optimize = True, progressive = True)
-            log("convert", 'Successfully converted the file "{0}" to webp and jpgp'.format(os.path.basename(hit_filename)),
-            "green")
-            os.mknod("{0}/{1}.convert".format(path, file))
-            os.remove(hit_filename)
-        hit_filename = new_filename + ".jpgp"
-        if use_webp:
-            hit_filename=new_filename+".webp"
-        if request_extension is not None:
-            hit_filename = new_filename+request_extension
-    if hit_filename is not None:
-        content = read_file(hit_filename, "rb")
-        log("info", 'Hit the file: "{0}"'.format(os.path.basename(hit_filename)))
-    return hit_filename, content
+            result_filename = hashlib.md5(str(hit_filename).encode('utf-8')).hexdigest()
+            result_file = "{0}convert/{1}".format(url, result_filename)
+            if hit_filename in files_unconvert:
+                # convert image to webp
+                unconvert_file = dir_list[files_unconvert.index(hit_filename)]
+                if not os.path.isdir("{0}convert".format(url)):
+                    os.mkdir("{0}convert".format(url))
+                image = Image.open(url+unconvert_file)
+                image.save(result_file + ".webp", "webp")
+                image.save(result_file + ".jpgp", "JPEG", quality=80, optimize=True, progressive=True)
+                log("convert",
+                    'Successfully converted the file "{0}" to webp and jpgp'.format(os.path.basename(hit_filename)),
+                    "green")
+                files_convert.append(hit_filename)
+                write_file(url + "convert_list.json",json.dumps(files_convert))
+                os.remove(url+unconvert_file)
+    if result_filename is not None:
+        content = read_file(result_file + result_type, "rb")
+        log("info", 'Hit the file: "{0}"'.format(os.path.basename(result_filename + result_type)))
+        return result_filename + result_type, content
+    return None,None
 
 
 
@@ -101,6 +103,8 @@ def send_request(self, response, content, length, filename=None):
 
 class RequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
+        image = None
+        filename = None
         use_webp = False
         url = location + url_parse.unquote(self.path)
         if url.find("?") != -1:
@@ -108,7 +112,16 @@ class RequestHandler(BaseHTTPRequestHandler):
             url = split_url[0]
         if self.headers['accept'].find("image/webp") != -1:
             use_webp = True
-        filename, image = get_image(url, use_webp)
+        if url.endswith('.webp') or url.endswith(".jpgp"):
+            path = os.path.dirname(url)
+            filename = os.path.basename(url)
+            filename_path="{0}/convert/{1}".format(path, filename)
+            if os.path.exists(filename_path):
+                image = read_file(filename_path,"rb")
+        if os.path.exists(url) and image is None:
+            if not url.endswith('/'):
+                url += '/'
+            filename, image = get_image(url, use_webp)
         if image is None:
             content = error_string("404 Not Found")
             send_request(self, 404, bytes(content, encoding="utf-8"), len(content))
