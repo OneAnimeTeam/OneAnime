@@ -49,7 +49,7 @@ def get_image(url, use_webp):
             files_convert = json.loads(read_file(url + "convert_list.json"))
         dir_list = list()
         for filename in os.listdir(url):
-            if os.path.splitext(filename)[1].lower() in ('.webp', '.jpg', '.jpeg', '.png'):
+            if os.path.splitext(filename)[1].lower() in ('.webp', '.jpgp', '.jpg', '.jpeg', '.png'):
                 dir_list.append(filename)
                 files_unconvert.append(os.path.splitext(filename)[0])
         files = files_convert+files_unconvert
