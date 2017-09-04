@@ -4,7 +4,7 @@ OneAnime is a random picture server, the original purpose is to allow visitors t
 
 ## Why use OneAnime
 
-* Convert the `jpg` `png` format to`.webp` format, save bandwidth and your disk space.
+* Convert format to`.webp` format, save bandwidth and your disk space.
 * Single file design, more compact and lightweight. Out of the box to use.
 
 ## Install the required environment
