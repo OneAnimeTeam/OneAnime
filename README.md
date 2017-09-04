@@ -35,16 +35,16 @@ You need to write your `config.json` according to `config.example.json` . Rememb
 }
 ```
 
-You can place the image in the directory you specified, only need to access the correct address when requested. For example, if you put the image in the `image / photos` directory, you can request` / photos' directly.
+You can place the image in the directory you specified, only need to access the correct address when requested. For example, if you put the image in the `image/photos` directory, you can request` /photos' directly.
 
 Once the configuration is complete, start your interpreter to start the OneAnime server:
 ```shell
 python3 oneanime.py
 ```
 
-## Keep running and monitor your blog
+## Keep running and monitor your OneAnime
 
-In order to avoid each update, the program error to bring you the trouble. SmartBlog strongly recommends that you use NodeJS-based monitoring programs: PM2
+In order to avoid each update, the program error to bring you the trouble. OneAnime strongly recommends that you use NodeJS-based monitoring programs: PM2
 
 For more information about PM2 installation, please see [How To Install Node.js on Ubuntu 16.04 | DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-16-04) and [PM2 - Quick Start](http://pm2.keymetrics.io/docs/usage/quick-start/)
 
@@ -54,7 +54,7 @@ Then you just need to run
 pm2 start oneanime.py
 ```
 
-It can be achieved in the update file or program error, automatically restart SmartBlog.
+It can be achieved in the update file or program error, automatically restart OneAnime.
 
 You can also use it
 
@@ -63,4 +63,4 @@ pm2 startup
 pm2 save
 ```
 
-So that your SmartBlog can start automatically when the system is powered on
+So that your OneAnime can start automatically when the system is powered on

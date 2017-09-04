@@ -42,9 +42,9 @@ pip3 install Pillow
     python3 oneanime.py
 ```
 
-## 持续运行并监控您的博客
+## 持续运行并监控您的 OneAnime
 
-为了避免每次更新，程序错误给您带来的困扰。 SmartBlog 强烈推荐您使用基于 NodeJS 的监控程序： PM2
+为了避免每次更新，程序错误给您带来的困扰。 OneAnime 强烈推荐您使用基于 NodeJS 的监控程序： PM2
 
 有关PM2的安装请查看 [How To Install Node.js on Ubuntu 16.04 | DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-install-node-js-on-ubuntu-16-04) 和 [PM2 - Quick Start](http://pm2.keymetrics.io/docs/usage/quick-start/)
 
@@ -54,7 +54,7 @@ pip3 install Pillow
 pm2 start oneanime.py
 ```
 
-就可以实现在更新文件或者程序错误之后，自动重启 SmartBlog。
+就可以实现在更新文件或者程序错误之后，自动重启 OneAnime。
 
 您还可以使用
 
@@ -63,4 +63,4 @@ pm2 startup
 pm2 save
 ```
 
-使得您的 SmartBlog 能够在系统开机的时候，自动启动
+使得您的 OneAnime 能够在系统开机的时候，自动启动
