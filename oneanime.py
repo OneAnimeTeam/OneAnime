@@ -13,7 +13,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
 
 project = 'OneAnime/3.0.3'
-server = null
+server = None
 
 def read_file(filename, mode="r"):
     f = open(filename, mode)
@@ -141,7 +141,9 @@ class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, INT_handler)
     signal.signal(signal.SIGHUP, INT_handler)
-    config = json.loads(read_file("./config.json"))
+    config = {"server":"0.0.0.0","port":8080,"location":"./image"}
+    if os.path.exists("./config.json"):
+        config = json.loads(read_file("./config.json"))
     server_info = (config["server"], config["port"])
     location = config["location"]
     log("info", 'Serving OneAnime on {0}:{1} '.format(server_info[0], server_info[1]))
