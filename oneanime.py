@@ -12,7 +12,7 @@ from PIL import Image
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
 
-project = 'OneAnime/3.0.3'
+project = 'OneAnime'
 server = None
 
 def read_file(filename, mode="r"):
