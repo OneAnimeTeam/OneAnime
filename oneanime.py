@@ -1,23 +1,19 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-import io
-import sys
-
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 import hashlib
 import json
 import os
 import random
+import signal
 import time
 import urllib.parse as url_parse
+from PIL import Image
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
 
-from PIL import Image
-
 project = 'OneAnime/3.0.3'
-
+server = null
 
 def read_file(filename, mode="r"):
     f = open(filename, mode)
@@ -133,16 +129,23 @@ class RequestHandler(BaseHTTPRequestHandler):
             return
         send_request(self, 200, image, len(image),filename=os.path.basename(filename))
 
-
+def INT_handler(signum, frame):
+    server.server_close()
+    exit(0)
 
 class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
     pass
 
+
+
 if __name__ == '__main__':
+    signal.signal(signal.SIGINT, INT_handler)
+    signal.signal(signal.SIGHUP, INT_handler)
     config = json.loads(read_file("./config.json"))
     server_info = (config["server"], config["port"])
     location = config["location"]
     log("info", 'Serving OneAnime on {0}:{1} '.format(server_info[0], server_info[1]))
     server = ThreadingHTTPServer(server_info, RequestHandler)
     server.serve_forever()
+
 
