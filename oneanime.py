@@ -8,9 +8,14 @@ import random
 import signal
 import time
 import urllib.parse as url_parse
-from PIL import Image
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
+
+try:
+    from PIL import Image
+except ImportError:
+    print("Please install the pillow package to support this feature")
+    exit(1)
 
 project = 'OneAnime'
 server = None
@@ -135,8 +140,6 @@ def INT_handler(signum, frame):
 
 class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
     pass
-
-
 
 if __name__ == '__main__':
     signal.signal(signal.SIGINT, INT_handler)
