@@ -8,5 +8,5 @@ ENV LIBRARY_PATH=/lib:/usr/lib
 
 RUN apk add --no-cache python3 zlib-dev jpeg-dev libwebp \
 && apk add --no-cache --virtual .build-deps musl-dev gcc python3-dev \
-&& pip3 install Pillow -i https://mirrors.ustc.edu.cn/pypi/web/simple \
+&& pip3 install Pillow \
 && apk del --purge .build-deps
