@@ -1,4 +1,4 @@
-image: hedaqing/docker-alpine-git
+image: docker.reallserver.cn/gitlab-ci-android
 push_to_github:
   only:
   - master
