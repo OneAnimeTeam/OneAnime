@@ -1,4 +1,4 @@
-image: docker.reallserver.cn/gitlab-ci-android
+image: docker.reallserver.cn/public/gitlab-ci-android
 push_to_github:
   only:
   - master
