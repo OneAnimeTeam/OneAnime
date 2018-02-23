@@ -69,6 +69,7 @@ def get_image(url, use_webp):
                 if not os.path.isdir("{0}convert".format(url)):
                     os.mkdir("{0}convert".format(url))
                 image = Image.open(url+unconvert_file)
+                image = image.convert("RGB")
                 image.save(result_file + ".webp", "webp")
                 image.save(result_file + ".jpgp", "JPEG", quality=100, optimize=True, progressive=True)
                 log("convert",
