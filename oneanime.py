@@ -45,7 +45,7 @@ def write_file(filename, content):
 def get_image(url, use_webp):
     result_type = ".webp"
     if not use_webp:
-        result_type = ".jpgp"
+        result_type = ".jpg"
     result_filename = None
     result_file = None
     if result_filename is None:
@@ -73,7 +73,7 @@ def get_image(url, use_webp):
                 image.save(result_file + ".webp", "webp")
                 image.save(result_file + ".jpg", "JPEG")
                 log("convert",
-                    'Successfully converted the file "{0}" to webp and jpgp'.format(os.path.basename(hit_filename)),
+                    'Successfully converted the file "{0}" to webp and jpg'.format(os.path.basename(hit_filename)),
                     "green")
                 files_convert.append(hit_filename)
                 write_file(url + "convert_list.json",json.dumps(files_convert))
@@ -119,7 +119,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             url = split_url[0]
         if self.headers['accept'].find("image/webp") != -1:
             use_webp = True
-        if url.endswith('.webp') or url.endswith(".jpgp"):
+        if url.endswith('.webp') or url.endswith(".jpg"):
             path = os.path.dirname(url)
             filename = os.path.basename(url)
             filename_path="{0}/convert/{1}".format(path, filename)
