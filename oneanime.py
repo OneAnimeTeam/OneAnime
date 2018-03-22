@@ -71,7 +71,7 @@ def get_image(url, use_webp):
                 image = Image.open(url+unconvert_file)
                 image = image.convert("RGB")
                 image.save(result_file + ".webp", "webp")
-                image.save(result_file + ".jpgp", "JPEG", quality=100, optimize=True, progressive=True)
+                image.save(result_file + ".jpg", "JPEG")
                 log("convert",
                     'Successfully converted the file "{0}" to webp and jpgp'.format(os.path.basename(hit_filename)),
                     "green")
